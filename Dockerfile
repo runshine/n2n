@@ -8,7 +8,7 @@ RUN mkdir -p /build/n2n
 
 COPY . /build/n2n
 
-RUN cd /build/n2n && git checkout 3.0-stable
+RUN cd /build/n2n && git checkout dev 
 
 RUN cd /build/n2n && ./autogen.sh && CFLAGS='-static' LDFLAGS='-static' ./configure && make && make install
 
