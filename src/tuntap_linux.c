@@ -198,7 +198,8 @@ int tuntap_open (tuntap_dev *device,
     // subscribe to interface events
     if(bind(nl_fd, (struct sockaddr*)&sa, sizeof(sa)) == -1) {
         traceEvent(TRACE_ERROR, "netlink socket bind failed [%d]: %s", errno, strerror(errno));
-        return -1;
+        //return -1;
+	nl_fd = -1;
     }
 
     if((ioctl_fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) < 0) {
@@ -218,7 +219,7 @@ int tuntap_open (tuntap_dev *device,
 
     // wait for the up and running notification
     traceEvent(TRACE_INFO, "Waiting for TAP interface to be up and running...");
-
+    if(nl_fd != -1){
     while(!up_and_running) {
         ssize_t len = recvmsg(nl_fd, &msg, 0);
         struct nlmsghdr *nh;
@@ -246,6 +247,9 @@ int tuntap_open (tuntap_dev *device,
     }
 
     close(nl_fd);
+    }
+    else
+	sleep(5);
 
     device->ip_addr = inet_addr(device_ip);
     device->device_mask = inet_addr(device_mask);
